@@ -5,6 +5,8 @@ extends Reference
 # license: MIT
 # description: A utility for any features useful in the context of a Godot Project.
 
+const conf_path := "res://addons.cfg"
+
 static func set_setting(p_name: String, p_default_value, p_pinfo: PropertyInfo) -> void:
 	p_pinfo.name = p_name
 	if not ProjectSettings.has_setting(p_name):
@@ -12,6 +14,7 @@ static func set_setting(p_name: String, p_default_value, p_pinfo: PropertyInfo) 
 
 	ProjectSettings.add_property_info(p_pinfo.to_dict())
 	ProjectSettings.set_initial_value(p_name, p_default_value)
+	save_to_config(p_name, p_default_value)
 
 static func set_settings_dict(settings_dict:Dictionary) -> void:
 	for property_key in settings_dict.keys():
@@ -22,3 +25,25 @@ static func set_settings_order(properties: Array, p_order: int) -> void:
 	for p in properties:
 		ProjectSettings.set_order(p, p_order)
 		p_order += 1
+
+static func get_addon_setting(p_name: String):
+	if Engine.editor_hint:
+		var setting = ProjectSettings.get_setting(p_name)
+		save_to_config(p_name, setting)
+		return setting
+	else:
+		return load_from_config(p_name)
+
+static func save_to_config(setting_path:String, value:String) -> void:
+	var config = ConfigFile.new()
+	var f = File.new()
+	if f.file_exists(conf_path):
+		config.load(conf_path)
+
+	config.set_value(setting_path, value)
+	config.save(conf_path)
+
+static func load_from_config(setting_path:String) -> String:
+	var config = ConfigFile.new()
+	config.load(conf_path)
+	return config.get_value(setting_path)
