@@ -41,11 +41,17 @@ static func save_to_config(setting_path:String, value:String) -> void:
 		config.load(conf_path)
 	
 	var p_conf = setting_path.split("/")
-	config.set_value(p_conf[1], p_conf[2], value)
+	if len(p_conf) == 2:
+		config.set_value(p_conf[1], p_conf[2], value)
+	else:
+		config.set_value("", setting_path, value)
 	config.save(conf_path)
 
 static func load_from_config(setting_path:String) -> String:
 	var config = ConfigFile.new()
 	config.load(conf_path)
 	var p_conf = setting_path.split("/")
-	return config.set_value(p_conf[1], p_conf[2])
+	if len(p_conf) == 2:
+		return config.get_value(p_conf[1], p_conf[2])
+	else:
+		return config.get_value("", setting_path)
