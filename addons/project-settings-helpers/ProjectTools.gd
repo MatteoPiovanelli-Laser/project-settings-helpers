@@ -14,7 +14,7 @@ static func set_setting(p_name: String, p_default_value, p_pinfo: PropertyInfo) 
 
 	ProjectSettings.add_property_info(p_pinfo.to_dict())
 	ProjectSettings.set_initial_value(p_name, p_default_value)
-	save_to_config(p_name[1], p_default_value)
+	save_to_config(p_name, p_default_value)
 
 static func set_settings_dict(settings_dict:Dictionary) -> void:
 	for property_key in settings_dict.keys():
@@ -26,13 +26,13 @@ static func set_settings_order(properties: Array, p_order: int) -> void:
 		ProjectSettings.set_order(p, p_order)
 		p_order += 1
 
-static func get_addon_setting(p_name: String):
+static func get_setting(p_name: String, default_value:="") -> String:
 	if Engine.editor_hint:
 		var setting = ProjectSettings.get_setting(p_name)
 		save_to_config(p_name, setting)
 		return setting
 	else:
-		return load_from_config(p_name)
+		return load_from_config(p_name, default_value)
 
 static func save_to_config(setting_path:String, value:String) -> void:
 	var config = ConfigFile.new()
@@ -41,17 +41,18 @@ static func save_to_config(setting_path:String, value:String) -> void:
 		config.load(conf_path)
 	
 	var p_conf = setting_path.split("/")
-	if len(p_conf) == 2:
+	if len(p_conf) == 3:
 		config.set_value(p_conf[1], p_conf[2], value)
 	else:
 		config.set_value("", setting_path, value)
 	config.save(conf_path)
 
-static func load_from_config(setting_path:String) -> String:
+static func load_from_config(setting_path:String, default_value:="") -> String:
 	var config = ConfigFile.new()
 	config.load(conf_path)
 	var p_conf = setting_path.split("/")
-	if len(p_conf) == 2:
-		return config.get_value(p_conf[1], p_conf[2])
+	prints(p_conf, len(p_conf))
+	if len(p_conf) == 3:
+		return config.get_value(p_conf[1], p_conf[2], default_value)
 	else:
-		return config.get_value("", setting_path)
+		return config.get_value("", setting_path, default_value)
