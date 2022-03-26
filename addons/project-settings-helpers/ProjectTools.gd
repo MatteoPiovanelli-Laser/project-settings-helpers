@@ -14,7 +14,7 @@ static func set_setting(p_name: String, p_default_value, p_pinfo: PropertyInfo) 
 
 	ProjectSettings.add_property_info(p_pinfo.to_dict())
 	ProjectSettings.set_initial_value(p_name, p_default_value)
-	save_to_config(p_name, p_default_value)
+	save_to_config(p_name, String(p_default_value))
 
 static func set_settings_dict(settings_dict:Dictionary) -> void:
 	for property_key in settings_dict.keys():
